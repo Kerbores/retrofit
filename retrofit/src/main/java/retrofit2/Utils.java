@@ -37,7 +37,7 @@ final class Utils {
   }
 
   static Class<?> getRawType(Type type) {
-    if (type == null) throw new NullPointerException("type == null");
+    checkNotNull(type, "type == null");
 
     if (type instanceof Class<?>) {
       // Type is a normal class.
@@ -376,14 +376,14 @@ final class Utils {
         throw new IllegalArgumentException();
       }
 
+      for (Type typeArgument : typeArguments) {
+        checkNotNull(typeArgument, "typeArgument == null");
+        checkNotPrimitive(typeArgument);
+      }
+
       this.ownerType = ownerType;
       this.rawType = rawType;
       this.typeArguments = typeArguments.clone();
-
-      for (Type typeArgument : this.typeArguments) {
-        if (typeArgument == null) throw new NullPointerException();
-        checkNotPrimitive(typeArgument);
-      }
     }
 
     @Override public Type[] getActualTypeArguments() {
@@ -407,9 +407,9 @@ final class Utils {
     }
 
     @Override public String toString() {
+      if (typeArguments.length == 0) return typeToString(rawType);
       StringBuilder result = new StringBuilder(30 * (typeArguments.length + 1));
       result.append(typeToString(rawType));
-      if (typeArguments.length == 0) return result.toString();
       result.append("<").append(typeToString(typeArguments[0]));
       for (int i = 1; i < typeArguments.length; i++) {
         result.append(", ").append(typeToString(typeArguments[i]));
